@@ -43,7 +43,7 @@ def split_cpu_data(cpu_line):
     return cpu_user, cpu_system,cpu_nice,cpu_idle,cpu_iowait,cpu_irq,cpu_softirq,cpu_usage
   else: return None
 
-def measure_resource_utilization(python_script='script.py', sampling_interval=1, output_file="cpu_utilization.csv", device = 'cuda'):
+def measure_resource_utilization(python_script='script.py', sampling_interval=1, output_file="utilization.csv", device = 'cuda'):
     first_iter=True
     #time0 = datetime.now()
     #start_time = time.time()
