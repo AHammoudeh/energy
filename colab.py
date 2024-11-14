@@ -313,7 +313,8 @@ def analyze_data(csv_path, with_GPU=True, smoothing_window = 1, alpha=0.5):
       # Adjust layout for better display
       plt.tight_layout()
       plt.show()
-
+    
+      '''
       # Plot: GPU Power utilization over time
       plt.figure(figsize=(FX, FY))
       plt.scatter(gpu_util, gpu_power_draw, color=colors, alpha=alpha, s=20)
@@ -325,4 +326,4 @@ def analyze_data(csv_path, with_GPU=True, smoothing_window = 1, alpha=0.5):
 
       # Adjust layout for better display
       plt.tight_layout()
-      plt.show()
+      plt.show()'''
