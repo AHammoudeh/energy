@@ -217,13 +217,13 @@ def analyze_data(csv_path, with_GPU=True, smoothing_window = 1, alpha=0.5):
     ax0.set_ylabel('CPU usage %', fontsize=Fntsize)
     ax0.legend(ncol=2)#loc='upper center', bbox_to_anchor=(0.2, -0.1),
     ax0.grid(True)
-    ax0.set_ylim(0,100)
+    ax0.set_ylim(0,102)
     # Plot: CPU memory utilization over time
     ax1.plot(time_seconds, memory_util,linestyle='--', color='k', label='CPU Utilization')# marker='o',
     ax1.set_xlabel('Time [s]', fontsize=Fntsize)
     ax1.set_ylabel('Memory %', fontsize=Fntsize)
     ax1.grid(True)
-    ax1.set_ylim(0,100)
+    ax1.set_ylim(0,102)
 
     if with_GPU:
       # Plot: GPU Utilization over time
@@ -292,23 +292,23 @@ def analyze_data(csv_path, with_GPU=True, smoothing_window = 1, alpha=0.5):
 
       fig, axs = plt.subplots(1, 2, figsize=(2*FX, 1*FY))
       # Plot: GPU Utilization over time
-      '''axs[1, 0].scatter(time_seconds, clocks_gr, color='blue', alpha=alpha, s=20)
-      axs[1, 0].set_xlabel('Time [s]', fontsize=Fntsize)
-      axs[1, 0].set_ylabel('clocks graphics [MHz]', fontsize=Fntsize)
-      axs[1, 0].grid(True)
+      axs[1].scatter(time_seconds, clocks_gr, color='blue', alpha=alpha, s=20)
+      axs[1].set_xlabel('Time [s]', fontsize=Fntsize)
+      axs[1].set_ylabel('clocks graphics [MHz]', fontsize=Fntsize)
+      axs[1].grid(True)
       #axs[1, 0].set_ylim(0)'''
       # Plot: GPU Memory Utilization over time
-      axs[1].scatter(time_seconds, clocks_sm, color='blue', alpha=alpha, s=20)
+      '''axs[1].scatter(time_seconds, clocks_sm, color='blue', alpha=alpha, s=20)
       axs[1].set_xlabel('Time [s]', fontsize=Fntsize)
       axs[1].set_ylabel('clocks SMs [MHz]', fontsize=Fntsize)
       axs[1].grid(True)
       #axs[1, 1].set_ylim(0)
-      # Plot: GPU Power over time
+      # Plot: GPU Power over time'''
 
       axs[0].scatter(time_seconds, clocks_mem, color='blue', alpha=alpha, s=20)
       axs[0].set_xlabel('Time [s]', fontsize=Fntsize)
-      axs[ 0].set_ylabel('clocks memory [MHz]', fontsize=Fntsize)
-      axs[ 0].grid(True)
+      axs[0].set_ylabel('clocks memory [MHz]', fontsize=Fntsize)
+      axs[0].grid(True)
       #axs[2, 0].set_ylim(0)
       # Adjust layout for better display
       plt.tight_layout()
