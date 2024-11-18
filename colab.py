@@ -178,7 +178,7 @@ def analyze_data(csv_path, with_GPU=True, smoothing_window = 1, alpha=0.5):
     print(f'Average CPU Utilization: {cpu_utilization.mean():.2f}%')
     print(f'Average Memory Utilization: {memory_util.mean():.2f}%')
     print(f'Average GPU Utilization: {gpu_util.mean():.2f}%')
-    print(f'Average GPU Power Utilization: { gpu_power_draw.mean():.2f} W')
+    print(f'Average GPU Power: { gpu_power_draw.mean():.2f} W')
 
     #smoothing
     window = smoothing_window
