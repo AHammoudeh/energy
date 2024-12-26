@@ -165,7 +165,7 @@ def measure_resource_utilization(script_path='scr!pt_path', sampling_interval=1,
         print("No CPU data recorded.")
 
 
-def analyze_data(csv_path, with_GPU=True, smoothing_window = 1, alpha=0.5):
+def analyze_data(csv_path="utilization.csv", with_GPU=True, smoothing_window = 1, alpha=0.2):
     # Read the CSV file
     df = pd.read_csv(csv_path)
     time_seconds = convert_time_to_seconds(df['Time'])
