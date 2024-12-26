@@ -71,88 +71,16 @@ def split_cpu_data(cpu_line):
     return cpu_user, cpu_system,cpu_nice,cpu_idle,cpu_iowait,cpu_irq,cpu_softirq,cpu_usage
   else: return None
 
-def measure_resource_utilization(script_path='script.py', sampling_interval=1, output_file="utilization.csv", device = 'cuda'):
-    first_iter=True
-    #time0 = datetime.now()
-    #start_time = time.time()
-    # Start monitoring CPU utilization using top
-    top_command = ['top', '-b', '-d', str(sampling_interval)]
-    top_process = subprocess.Popen(top_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-    # Start the Python script in the background
-    process = subprocess.Popen(['python3', script_path])
-    process_output_file = output_file.replace('.csv','_process.csv')
-    # Create and open a CSV file to save CPU utilization records
-    with open(output_file, mode='w', newline='') as cpu_file, open(process_output_file, mode='w', newline='') as process_file:
-        cpu_writer = csv.writer(cpu_file)
-        process_writer = csv.writer(process_file)
-        # Execute the command
-        # Write headers for CPU usage stats
-        cpu_writer.writerow(["Date", "Time", "Process", "cpu_util", "memory_util","disk_util", "user", "system", "nice", "idle", "iowait", "IRQ", "softIRQ",
-                              "gpu_power_draw", "gpu_util", "gpu_memory_util", "gpu_temp", "gpu_state", "clocks_gr","clocks_sm","clocks_mem"])
-        # Write headers for process-specific stats
-        process_writer.writerow(["Date", "Time","PID", "USER", "PR", "NI", "VIRT", "RES", "SHR", "S", "%CPU", "%MEM", "TIME+", "COMMAND"])
-        total_cpu_usage = 0
-        sample_count = 0
-        try:
-            # Monitor CPU usage while the script is running
-            while process.poll() is None:  # Poll will return None while the script is running
-                disk_util = psutil.disk_usage('/').percent
-                cpu_line = top_process.stdout.readline()
-                # Capture CPU utilization line
-                if "Cpu(s)" in cpu_line:
-                    # Parse the line to extract various CPU statistics
-                    try:
-                        cpu_user, cpu_system,cpu_nice,cpu_idle,cpu_iowait,cpu_irq,cpu_softirq,cpu_usage = split_cpu_data(cpu_line)
-                        total_cpu_usage += cpu_usage
-                        #if first_iter:
-                        #  timestamp = time0
-                        #  first_iter= False
-                        #else:
-                        #  timestamp = datetime.now()
-                        sample_count += 1
-                        # Save the record in the CPU utilization CSV file
-                        gpu_power_draw, gpu_utilization, gpu_memory_utilization, gpu_temp, gpu_state, clocks_gr,clocks_sm,clocks_mem = get_gpu_stats(device)
-                        # Save the record in the CPU utilization CSV file
-                    except:
-                      print('error there')
-                timestamp = datetime.now()
-                if "MiB Mem" in cpu_line:
-                  c = cpu_line.split()
-                  memory_util = round(100*(1-(float(c[5])/float(c[3]))),1)
-                  cpu_writer.writerow([timestamp.strftime('%Y-%m-%d'), timestamp.strftime('%H:%M:%S.%f'), "all", cpu_usage, memory_util,disk_util,
-                                            cpu_user, cpu_system, cpu_nice, cpu_idle,
-                                            cpu_iowait, cpu_irq, cpu_softirq,
-                                            gpu_power_draw, gpu_utilization, gpu_memory_utilization, gpu_temp, gpu_state, clocks_gr,clocks_sm,clocks_mem])
-                # Capture process-specific utilization data
-                if "PID" in cpu_line:  # Process list starts right after this line
-                    # Skip the next line, which is column headers
-                    top_process.stdout.readline()
-                    # Now, collect the data for each process
-                    loop=True
-                    while loop:
-                        proc_line = top_process.stdout.readline().strip()
-                        if proc_line:
-                            # Split the line into process details
-                            proc_data = proc_line.split()
-                            if len(proc_data) >= 11:
-                                # PID, USER, PR, NI, VIRT, RES, SHR, S, %CPU, %MEM, TIME+, COMMAND
-                                process_writer.writerow([timestamp.strftime('%Y-%m-%d'), timestamp.strftime('%H:%M:%S.%f')]+proc_data[:12])
-                        else:
-                          loop=False
-        finally:
-            #print(f"Total run time: {(timestamp - time0).seconds:.0f} sec")#time.time() - start_time:.2f} sec")
-            top_process.terminate()
-    if sample_count > 0:
-        average_cpu_utilization = total_cpu_usage / sample_count
-        print(f"Average CPU Utilization: {average_cpu_utilization:.2f}%")
-    else:
-        print("No CPU data recorded.")
+def calc_energy(runtime,utilization, P100=61, P0=10, num_cpu=2):
+  power = num_cpu*(P0 + (P100-P0)*utilization)
+  energy = power*runtime
+  #print('cpu_energy:',cpu_energy, 'Joul')
+  return energy, power
 
-
-def measure_resource_utilization(script_path='scr!pt_path', sampling_interval=1, output_file="utilization.csv", device = 'cuda',python_script='FP'):
+def measure_resource_utilization(script_path='scr!pt_path', sampling_interval=1, output_file="utilization.csv", device = 'cuda',python_script='dum'):
     first_iter=True
     # For compatability with a previous version (to be deleted later)
-    if (script_path=='scr!pt_path') and (not (python_script=='PF')):
+    if (script_path=='scr!pt_path') and (not (python_script=='dum')):
       script_path = python_script
     #time0 = datetime.now()
     #start_time = time.time()
@@ -274,6 +202,12 @@ def analyze_data(csv_path, with_GPU=True, smoothing_window = 1, alpha=0.5):
     print(f'Average Disk Utilization: {disk_util.mean():.2f}%')
     print(f'Average GPU Utilization: {gpu_util.mean():.2f}%')
     print(f'Average GPU Power: { gpu_power_draw.mean():.2f} W')
+    runtime = time_seconds.max()
+    Avg_cpu_util = cpu_utilization.mean()
+    colab_cpu_energy, colab_cpu_power = calc_energy(runtime,Avg_cpu_util, P100=61, P0=10, num_cpu=2)
+    print(f'Approx. Colab CPU Power: { colab_cpu_power:.0f} W')
+    print(f'Approx. Colab CPU Energy: { colab_cpu_energy:.0f} J')
+    
     #smoothing
     window = smoothing_window
     cpu_utilization = smooth_MA(cpu_utilization, window)
