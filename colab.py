@@ -72,7 +72,7 @@ def split_cpu_data(cpu_line):
   else: return None
 
 def calc_energy(runtime,utilization, P100=61, P0=10, num_cpu=2):
-  power = num_cpu*(P0 + (P100-P0)*utilization)
+  power = num_cpu*(P0 + (P100-P0)*utilization/100)
   energy = power*runtime
   #print('cpu_energy:',cpu_energy, 'Joul')
   return energy, power
